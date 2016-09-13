@@ -1,0 +1,5 @@
+server/node_modules
+wrapper/wrapper
+wrapper/setup
+*.o
+*.swp

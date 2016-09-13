@@ -1,0 +1,27 @@
+doctype html
+html
+  head
+    title
+    link(rel='stylesheet', href='/css/bootstrap.min.css', integrity='sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u', crossorigin='anonymous')
+    script(src='/js/bootstrap.min.js', integrity='sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa', crossorigin='anonymous')
+  body
+    #loginModal.modal.show(tabindex='-1', role='dialog', aria-hidden='true')
+      center
+        h1=  'IITK Programming Judge - ACA' 
+        .bg-danger(hidden=error?false:true)= error
+      .modal-dialog
+        .modal-content
+          .modal-header
+            h1.text-center Login
+          .modal-body
+            form.form.col-md-12.center-block(action='/login', method='post')
+              .form-group
+                input.form-control.input-lg(type='text', name='username', placeholder='Email')
+              .form-group
+                input.form-control.input-lg(type='password', name='password', placeholder='Password')
+              .form-group
+                button.btn.btn-primary.btn-lg.btn-block(type='submit', value='Submit') Sign In
+                span.pull-right
+                span
+          .modal-footer
+            .col-md-12

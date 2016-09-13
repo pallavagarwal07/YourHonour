@@ -1,0 +1,36 @@
+{
+    "c": {
+        "name": "C",
+        "image": "judge-gcc",
+        "filename": "file1.c",
+        "compile": true,
+        "compile_cmd": ["gcc", "-lm", "-O2",
+            "-fomit-frame-pointer", "-o", "code", "file1.c"],
+        "execute": [ "./code" ],
+        "input": "input",
+        "output": "output",
+        "executable": "code"
+    },
+    "cpp": {
+        "name": "C++",
+        "image": "judge-gcc",
+        "filename": "file1.cpp",
+        "compile": true,
+        "compile_cmd": ["g++", "--std=c++11", "-lm",
+            "-O2", "-fomit-frame-pointer", "-o", "code", "file1.cpp"],
+        "execute": [ "./code" ],
+        "input": "input",
+        "output": "output",
+        "executable": "code"
+    },
+    "node": {
+        "name": "NodeJS",
+        "image": "judge-node",
+        "filename": "file1.js",
+        "compile": false,
+        "execute": [ "node", "file1.js" ],
+        "input": "input",
+        "output": "output",
+        "executable": "file1.js"
+    }
+}

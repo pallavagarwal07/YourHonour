@@ -1,0 +1,41 @@
+doctype html
+html
+  head
+    title Judge Dashboard
+    link(rel='stylesheet', href='/css/bootstrap.min.css')
+    link(rel='stylesheet', href='/css/custom.css')
+    script(src='/js/jquery.min.js')
+    script(src='/js/bootstrap.min.js')
+    script(src='/js/common.js')
+    meta(name='viewport' content='width=device-width, initial-scale=1')
+  body
+    .container
+      .row
+        .col-xs-4
+          h1= 'DASHBOARD'
+        .col-xs-8.vertical-center
+          div.btn-group(role="group")
+            a.btn.btn-default(href='/submissions' role='button' style="outline: none") Submissions
+            a.btn.btn-default(href='/questions' role='button') Questions
+            a.btn.btn-default.active(href='/dashboard' role='button') Dashboard
+            a.btn.btn-default(href='/logout' role='button') Logout
+      br
+      .jumbotron
+        .row
+          form.form.col-md-12(action='/submit', method='post')
+            .row
+              .col-xs-12
+                textarea.form-control(placeholder='Input Code Here' name='code' rows=14)
+            br
+            .row
+                .dropdown.col-xs-3
+                  select.form-control(id='sel1' name='qno')
+                    - for(var i=1; i<=ques; i++) {
+                    option= "Question "+i
+                    - }
+                button.btn.btn-primary.col-xs-6 Submit
+                .dropdown.col-xs-3.dropdown-menu-right
+                  select.form-control(id='sel1' name='lang')
+                    - for(var i in langs) {
+                    option= i
+                    - }
