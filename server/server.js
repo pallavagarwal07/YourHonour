@@ -31,8 +31,12 @@ app.use(passport.session());
 app.use(flash());
 require('./app/routes.js')(app, passport);
 app.use(express.static('views'));
+app.get(/(.*)/, function(req, res) {
+    res.status(404);
+    res.render("404", {url: req.params[0]});
+});
 
-fileServer.use(express.static('files'));
+fileServer.use(express.static('contest'));
 
 fileServer.listen(9090);
 app.listen(port);

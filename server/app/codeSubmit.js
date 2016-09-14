@@ -9,14 +9,27 @@ var executed = {};
 var name2id = {};
 var id2name = {};
 var images = {};
+
 var numQues = fs.readdirSync("contest").filter(function(file) {
     return fs.statSync(path.join("contest", file)).isDirectory();
 }).length;
+
 var forceUpdate = function() {
     numQues = fs.readdirSync("contest").filter(function(file) {
-        return fs.statSync(path.join("contest", file)).isDirectory();
+        return fs.statSync(path.join("contest", file)).isDirectory() && file.match(/^\d+$/);
     }).length;
     module.exports.numQues = numQues;
+};
+
+var combine = function(obj1, obj2) {
+    ret = {};
+    for(var i in obj1) {
+        ret[i] = obj1[i];
+    }
+    for(var i in obj2) {
+        ret[i] = obj2[i];
+    }
+    return ret;
 };
 
 for(var i in config) {
@@ -62,35 +75,48 @@ var getStatus = function(req, res) {
     }
 };
 
+var getTmpURL = function(strn) {
+    if(typeof strn !== "string")
+        strn = JSON.stringify(strn);
+    var hash = md5(strn);
+
+    try {
+        fs.statSync("contest/tmp/"+hash, fs.F_OK);
+    } catch (e) {
+        fs.writeFileSync("contest/tmp/"+hash, strn);
+    }
+    return "tmp/"+hash;
+}
+
 var submit = function(req, res) {
-    var md5hash = md5(req.body.code);
-    var filename = req.user + "." + b64(req.body.qno) + "." + b64(req.body.lang) + "." + md5hash;
-    filename = filename.replace(/=/g, '');
+    child = exec("ip route get 8.8.8.8 | awk '{print $NF; exit}'", function(err, ip, stderr) {
+        if(stderr !== "" || err !== null)
+            return res.send("System error occured in looking up the hostname");
+        if(!req.body.qno.match(/\d+/))
+            return res.send("System error occured in checking question number");
 
-    fs.writeFile("files/"+filename, req.body.code, function(err) {
-        if(err) {
-            console.log(err);
-            return res.send("System error occured");
-        }
+        qno = parseInt(req.body.qno.match(/\d+/)[0]);
+        base_url = "http://" + ip.trim() + ":9090/";
+        config1  = config[name2id[req.body.lang]];
+        config2  = JSON.parse(fs.readFileSync("contest/"+qno+"/config.json"));
+        configN  = combine(config1, config2);
 
-        child = exec("ip route get 8.8.8.8 | awk '{print $NF; exit}'", function(err, ip, stderr){
+        url_conf = base_url + getTmpURL(configN);
+        url_code = base_url + getTmpURL(req.body.code);
+        url_inp  = base_url + qno + "/inputs/1"
+        url_out  = base_url + qno + "/outputs/1"
+
+        uniqueId = Math.floor(new Date()) + "-" + req.user;
+
+        cmd = "kubectl run --requests='cpu=1,memory=1224Mi' --restart=Never " +
+               "--image=" + images[name2id[req.body.lang]] + " " + uniqueId +
+               " -- " + url_conf + " " + url_code + " " + url_inp + " " + url_out;
+
+        child2 = exec(cmd, function(err, stdout, stderr) {
             if(stderr !== "" || err !== null)
-                return res.send("System error occured in looking up the hostname");
-            url_conf = "http://" + ip.trim() + ":9090/" + configs[req.body.lang];
-            url_code = "http://" + ip.trim() + ":9090/" + filename;
-            url_inp = "http://" + ip.trim() + ":9090/inputs/" + configs[req.body.qno];
-            url_out = "http://" + ip.trim() + ":9090/outputs/" + configs[req.body.qno];
-
-            uniqueId = Math.floor(new Date()) + "-" + req.user;
-            cmd = "kubectl run --requests='cpu=1,memory=1224Mi' --restart=Never --image=" + images[req.body.lang] +
-                " " + uniqueId + " -- " + url_conf + " " + url_code + " " +
-                url_inp + " " + url_out;
-            child2 = exec(cmd, function(err, stdout, stderr) {
-                if(stderr !== "" || err !== null)
-                    return res.send("System error occured in running kubectl");
-                scheduled.push(uniqueId);
-                return res.send(cmd);
-            });
+                return res.send("System error occured in running kubectl");
+            scheduled.push(uniqueId);
+            return res.send(cmd);
         });
     });
 };

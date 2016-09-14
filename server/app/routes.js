@@ -15,9 +15,11 @@ module.exports = function(app, passport) {
 
     app.get("/questions", isLoggedIn, function(req, res) {
         submitModule.forceUpdate();
-        set = {'total': submitModule.numQues, 'points': []};
+        set = {'total': submitModule.numQues, 'points': [], 'names': []};
         for(var i=1; i<=submitModule.numQues; i++) {
-            set.points[i] = JSON.parse(fs.readFileSync("contest/"+i+"/config.json")).points;
+            par = JSON.parse(fs.readFileSync("contest/"+i+"/config.json"));
+            set.points[i] = par.points;
+            set.names[i] = par.name || "";
         }
         res.render('questions', set);
     });
@@ -33,11 +35,14 @@ module.exports = function(app, passport) {
         });
     });
 
-    app.get(/\/(\d+)/, isLoggedIn, function(req, res) {
+    app.get(/^\/(\d+)$/, isLoggedIn, function(req, res, next) {
         var ques = parseInt(req.params[0]);
+        submitModule.forceUpdate();
+        if (ques > submitModule.numQues) {
+            next();
+            return;
+        }
         fs.readFile("contest/" + ques + "/index.md", function(err, data) {
-            if (err)
-                throw err;
             content = marked(data + "");
             res.render('question', {content: content, ques: ques});
         });
