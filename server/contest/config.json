@@ -34,6 +34,18 @@
         "output": "output",
         "executable": "file1"
     },
+    "java": {
+        "name": "Java 1.8",
+        "image": "judge-java",
+        "filename": "file1.java",
+        "compile": true,
+        "compile_cmd": [ "sh", "-c",
+            "set -e; a=$(ls -1A); javac file1.java; b=$(ls -1A); echo -e \"$a\n$b\" | sort | uniq -u > class" ],
+        "execute": [ "sh", "-c", "exec java `cat class | sed -r \"s\/\\.class$\/\/g\"`" ],
+        "input": "input",
+        "output": "output",
+        "executable": "file1.java"
+    },
     "python2": {
         "name": "Python 2.7",
         "image": "judge-python2",

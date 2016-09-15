@@ -1,5 +1,5 @@
 arrayMappings = {};
-arrayMappings[1] = '<a href="#" data-toggle="tooltip" title="Non Zero Exit Code" ADD_PROPERTY>NZEC</a>'
+arrayMappings[1] = '<a href="#" data-toggle="popover" title="Non Zero Exit Code" ADD_PROPERTY>NZEC</a>'
 arrayMappings[0]  = '<a href="#" data-toggle="popover" title="Accepted" ADD_PROPERTY>AC</a>';
 arrayMappings[-1] = '<a href="#" data-toggle="popover" title="Compiler Error" ADD_PROPERTY>CE</a>';
 arrayMappings[-2] = '<a href="#" data-toggle="popover" title="Wrong Answer" ADD_PROPERTY>WA</a>';
