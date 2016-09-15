@@ -1,4 +1,4 @@
-FROM iron/gcc:dev
+FROM iron/go:dev
 COPY wrapper/setup wrapper/wrapper /bin/
 RUN ["mkdir", "/work"]
 WORKDIR "/work"

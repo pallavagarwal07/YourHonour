@@ -12,7 +12,7 @@
         "executable": "code"
     },
     "cpp": {
-        "name": "C++",
+        "name": "C++ 11",
         "image": "judge-gcc",
         "filename": "file1.cpp",
         "compile": true,
@@ -22,6 +22,17 @@
         "input": "input",
         "output": "output",
         "executable": "code"
+    },
+    "go": {
+        "name": "Go",
+        "image": "judge-go",
+        "filename": "file1.go",
+        "compile": true,
+        "compile_cmd": ["go", "build", "file1.go"],
+        "execute": [ "./file1" ],
+        "input": "input",
+        "output": "output",
+        "executable": "file1"
     },
     "python2": {
         "name": "Python 2.7",

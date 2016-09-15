@@ -10,8 +10,8 @@ Once the functionality is complete, I will work on adding support for easy deplo
 on any nodes. If you think you have suggestons, or if you are willing to contribute to
 this project, I would be delighted to accept your pull request.
 
-LICENSE
-=======
+
+---
 
 The project is released under a MIT License.
 
