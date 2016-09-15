@@ -23,6 +23,26 @@
         "output": "output",
         "executable": "code"
     },
+    "python2": {
+        "name": "Python 2.7",
+        "image": "judge-python2",
+        "filename": "file1.py",
+        "compile": false,
+        "execute": [ "python2", "file1.py" ],
+        "input": "input",
+        "output": "output",
+        "executable": "file1.py"
+    },
+    "python3": {
+        "name": "Python 3.5",
+        "image": "judge-python3",
+        "filename": "file1.py",
+        "compile": false,
+        "execute": [ "python3", "file1.py" ],
+        "input": "input",
+        "output": "output",
+        "executable": "file1.py"
+    },
     "node": {
         "name": "NodeJS",
         "image": "judge-node",

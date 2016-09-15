@@ -1,0 +1,5 @@
+FROM iron/python:3
+COPY wrapper/setup wrapper/wrapper /bin/
+RUN ["mkdir", "/work"]
+WORKDIR "/work"
+ENTRYPOINT ["setup"]

@@ -1,6 +1,8 @@
+.PHONY: clean
+
 OBJECTS=bin/main.o
-FLAGS= -g
-CC=g++ --std=c++11 -static
+FLAGS= 
+CC=g++ --std=c++11 -static -g -rdynamic
 
 all: setup wrapper
 
@@ -8,7 +10,7 @@ setup: src/setup.go
 	CGO_ENABLED=0 go build src/setup.go
 
 wrapper: $(OBJECTS)
-	$(CC) -o wrapper $(OBJECTS)
+	$(CC) -o wrapper $(OBJECTS) $(FLAGS)
 
 bin/%.o: src/%.cpp
 	$(CC) -c $< -o $@ $(FLAGS)

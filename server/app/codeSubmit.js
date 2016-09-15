@@ -35,7 +35,7 @@ var combine = function(obj1, obj2) {
 for(var i in config) {
     id2name[i] = config[i].name;
     name2id[config[i].name] = i;
-    images[i] = "pallavagarwal07/" + config[i].image;
+    images[i] = "pallavagarwal07/" + config[i].image + ":latest";
 }
 
 var getStatus = function(req, res) {
@@ -116,7 +116,8 @@ var submit = function(req, res) {
             if(stderr !== "" || err !== null)
                 return res.send("System error occured in running kubectl");
             scheduled.push(uniqueId);
-            return res.send(cmd);
+            req.flash('msg', 'Submitted Successfully');
+            return res.redirect('/submissions');
         });
     });
 };
