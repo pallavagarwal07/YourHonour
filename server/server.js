@@ -14,8 +14,9 @@ var session      = require('express-session');
 
 var configDB = require('./config/database.js');
 var passStrategy = require('./config/passport.js');
+var MongoStore = require('connect-mongo')(session);
 
-mongoose.connect(configDB.url);
+mongoose.connect(configDB.url + "/session");
 
 // require('./config/passport')(passport); // pass passport for configuration
 app.set('views', './views')
@@ -24,8 +25,15 @@ app.use(morgan('dev'));
 app.use(cookieParser());
 app.use(bodyParser());
 
-
-app.use(session({ secret: 'acamadethiscrap' }));
+app.use(session({ 
+    secret: 'acamadethiscrap',
+    maxAge: new Date(Date.now() + 3600000),
+    store: new MongoStore({
+        mongooseConnection:mongoose.connection
+    }, function(err) {
+        console.log(err || 'connect-mongodb setup ok');
+    })
+}));
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());

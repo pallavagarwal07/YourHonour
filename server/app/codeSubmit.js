@@ -108,10 +108,22 @@ var submit = function(req, res) {
 
         uniqueId = Math.floor(new Date()) + "-" + req.user;
 
-        spec = { "containers": [{
+        spec = { 
+            "containers": [{
                 "name": uniqueId,
                 "image": images[name2id[req.body.lang]],
                 "args": [url_conf, url_code, url_inp, url_out],
+                "imagePullPolicy": "IfNotPresent",
+                "resources": {
+                    "limits": {
+                        "cpu": 1,
+                        "memory": "1224Mi"
+                    },
+                    "request": {
+                        "cpu": 1,
+                        "memory": "1224Mi"
+                    }
+                },
                 "securityContext": { "privileged": true }
         }]};
         spec = JSON.stringify({"spec": spec});
