@@ -108,13 +108,27 @@ var submit = function(req, res) {
 
         uniqueId = Math.floor(new Date()) + "-" + req.user;
 
-        cmd = "kubectl run --requests='cpu=1,memory=1224Mi' --restart=Never " +
-               "--image=" + images[name2id[req.body.lang]] + " " + uniqueId +
-               " -- " + url_conf + " " + url_code + " " + url_inp + " " + url_out;
+        spec = { "containers": [{
+                "name": uniqueId,
+                "image": images[name2id[req.body.lang]],
+                "args": [url_conf, url_code, url_inp, url_out],
+                "securityContext": { "privileged": true }
+        }]};
+        spec = JSON.stringify({"spec": spec});
+
+
+        cmd = "kubectl run --requests='cpu=1,memory=1224Mi' --restart=Never "+
+               "--image=" + images[name2id[req.body.lang]] +
+               " --overrides='" + spec + "' " + uniqueId + " -- " + url_conf +
+               " " + url_code + " " + url_inp + " " + url_out;
 
         child2 = exec(cmd, function(err, stdout, stderr) {
-            if(stderr !== "" || err !== null)
+            if(stderr !== "" || err !== null) {
+                console.log(cmd)
+                console.log(stderr)
+                console.log(err)
                 return res.send("System error occured in running kubectl");
+            }
             scheduled.push(uniqueId);
             req.flash('msg', 'Submitted Successfully');
             return res.redirect('/submissions');

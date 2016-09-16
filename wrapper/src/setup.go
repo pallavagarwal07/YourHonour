@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -9,10 +8,12 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"strings"
 )
 
 func check(err error) {
 	if err != nil {
+		fmt.Println(err)
 		panic(err)
 	}
 }
@@ -77,12 +78,30 @@ func main() {
 	_, err = io.Copy(out, resp.Body)
 	check(err)
 
+	command := `
+set -e
+adduser dummy >/dev/null 2>&1 << EOF
+dummypass
+dummypass
+EOF
+
+ip link set eth0 down >/dev/null 2>&1
+rm -f /sbin/ip /sbin/ifconfig /sbin/route /sbin/arp
+echo "done"
+	`
+	ret, err := exec.Command("sh", "-c", command).CombinedOutput()
+	if strings.TrimSpace(string(ret)) != "done" {
+		fmt.Println("-9090\nUser manipulation command failed. Server Error. Aborting")
+		os.Exit(1)
+	}
+
 	cmd := exec.Command("wrapper")
-	var output bytes.Buffer
-	cmd.Stdout = &output
-	err = cmd.Run()
-	check(err)
-	fmt.Print(output.String())
+	ret, err = cmd.CombinedOutput()
+	if err != nil {
+		fmt.Println(fmt.Sprint(err) + ": " + string(ret))
+	} else {
+		fmt.Println(string(ret))
+	}
 
 	// Cleaning up
 	os.Remove("config.json")
