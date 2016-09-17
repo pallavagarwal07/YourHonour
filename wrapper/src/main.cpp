@@ -54,6 +54,7 @@ static inline string &rtrim(string &s) {
 // trim from both ends
 static inline string &trim(string &s) { return ltrim(rtrim(s)); }
 
+int ctu = 0;
 char *readFile(char *name) {
     int n;
     FILE *config = fopen(name, "r");
@@ -135,7 +136,6 @@ int main() {
     init();
 
     int n, timeout;
-    sigset_t mask, orig_mask;
     analysis report;
     report.retcode = 0;
     report.fault_signal = "";
@@ -145,13 +145,15 @@ int main() {
     vector<char *> args;
     long double time_child = 0;
 
-    sigemptyset(&mask);
-    sigaddset(&mask, SIGCHLD);
-
     json = readFile("config.json");
 
     d.Parse(json);
     timeout = d["timeout"].GetInt();
+    Value &s = d["output"];
+    char *filename = (char *)s.GetString();
+    string contents = readFile(filename);
+    remove(filename);
+    remove("config.json");
 
     if (d["compile"].GetBool() == 1) {
         Value &s = d["compile_cmd"];
@@ -164,11 +166,15 @@ int main() {
             int fd_err =
                 open("err", O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
 
-            if ((n = dup2(fd_out, 1)) < 0)
-                printf("Error :( %d\n", errno);
+            if ((n = dup2(fd_out, 1)) < 0) {
+                printf("Error :( %s\n", strerror(errno));
+                exit(2);
+            }
 
-            if ((n = dup2(fd_err, 2)) < 0)
-                printf("Error :( %d\n", errno);
+            if ((n = dup2(fd_err, 2)) < 0) {
+                printf("Error :( %s\n", strerror(errno));
+                exit(3);
+            }
 
             char **arr = (char **)malloc((args.size() + 1) * sizeof(char *));
             for (int i = 0; i < args.size(); i++) {
@@ -203,14 +209,20 @@ int main() {
                 open("err", O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
             int fd_inp = open((char *)d["input"].GetString(), O_RDONLY);
 
-            if ((n = dup2(fd_inp, 0)) < 0)
-                printf("Error :( %d\n", errno);
+            if ((n = dup2(fd_inp, 0)) < 0) {
+                printf("Error :( %s\n", strerror(errno));
+                exit(1);
+            }
 
-            if ((n = dup2(fd_out, 1)) < 0)
-                printf("Error :( %d\n", errno);
+            if ((n = dup2(fd_out, 1)) < 0) {
+                printf("Error :( %s\n", strerror(errno));
+                exit(2);
+            }
 
-            if ((n = dup2(fd_err, 2)) < 0)
-                printf("Error :( %d\n", errno);
+            if ((n = dup2(fd_err, 2)) < 0) {
+                printf("Error :( %s\n", strerror(errno));
+                exit(3);
+            }
 
             char **arr = (char **)malloc((args.size() + 1) * sizeof(char *));
             for (int i = 0; i < args.size(); i++) {
@@ -233,10 +245,6 @@ int main() {
     }
 
     if (report.retcode == 0) {
-        Value &s = d["output"];
-        char *filename = (char *)s.GetString();
-
-        string contents = readFile(filename);
         string our_outp = report.fault_signal;
 
         if (trim(contents) == trim(our_outp)) {

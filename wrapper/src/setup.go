@@ -86,12 +86,17 @@ dummypass
 EOF
 
 ip link set eth0 down >/dev/null 2>&1
-rm -f /sbin/ip /sbin/ifconfig /sbin/route /sbin/arp
+chown dummy:dummy $(which wrapper)
+chmod a+s $(which wrapper)
+chown dummy:dummy input output config.json file1.py
+chown dummy:dummy $(pwd)
+sync
 echo "done"
 	`
 	ret, err := exec.Command("sh", "-c", command).CombinedOutput()
 	if strings.TrimSpace(string(ret)) != "done" {
 		fmt.Println("-9090\nUser manipulation command failed. Server Error. Aborting")
+		fmt.Println(string(ret))
 		os.Exit(1)
 	}
 
