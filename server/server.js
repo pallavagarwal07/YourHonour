@@ -17,6 +17,10 @@ var passStrategy = require('./config/passport.js');
 var MongoStore = require('connect-mongo')(session);
 
 mongoose.connect(configDB.url + "/session");
+var userSchema = mongoose.Schema({
+        name: String,
+
+});
 
 // require('./config/passport')(passport); // pass passport for configuration
 app.set('views', './views')
