@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
 )
 
@@ -38,7 +39,29 @@ func main() {
 			"<output_url>")
 		os.Exit(0)
 	}
-	out, err := os.Create("config.json")
+
+	cmd_setup := `
+set -e
+adduser dummy >/dev/null 2>&1 << EOF
+dummypass
+dummypass
+EOF
+
+chown dummy:dummy $(which wrapper)
+chmod a+s $(which wrapper)
+mkdir /IO
+chmod 700 /IO
+echo "done"`
+
+	ret, err := exec.Command("sh", "-c", cmd_setup).CombinedOutput()
+	if strings.TrimSpace(string(ret)) != "done" {
+		fmt.Println("-9090\nUser manipulation command failed.",
+			"Server Error. Aborting")
+		fmt.Println(string(ret))
+		os.Exit(1)
+	}
+
+	out, err := os.Create("/IO/config.json")
 	check(err)
 	defer out.Close()
 	resp, err := http.Get(os.Args[1])
@@ -48,7 +71,7 @@ func main() {
 	check(err)
 
 	var rcfile Config
-	str, _ := ioutil.ReadFile("config.json")
+	str, _ := ioutil.ReadFile("/IO/config.json")
 	json.Unmarshal(str, &rcfile)
 
 	out, err = os.Create(rcfile.Filename)
@@ -60,51 +83,79 @@ func main() {
 	_, err = io.Copy(out, resp.Body)
 	check(err)
 
-	out, err = os.Create(rcfile.Input)
-	check(err)
-	defer out.Close()
-	resp, err = http.Get(os.Args[3])
-	check(err)
-	defer resp.Body.Close()
-	_, err = io.Copy(out, resp.Body)
+	quesUrl := string(os.Args[3])
+	numInputs, err := strconv.Atoi(string(os.Args[4]))
 	check(err)
 
-	out, err = os.Create(rcfile.Output)
-	check(err)
-	defer out.Close()
-	resp, err = http.Get(os.Args[4])
-	check(err)
-	defer resp.Body.Close()
-	_, err = io.Copy(out, resp.Body)
-	check(err)
+	for i := 1; i <= numInputs; i++ {
+
+		inp_name := quesUrl + "/inputs/" + strconv.Itoa(i)
+		out_name := quesUrl + "/outputs/" + strconv.Itoa(i)
+
+		out, err = os.Create("/IO/in" + strconv.Itoa(i))
+		check(err)
+		defer out.Close()
+		resp, err = http.Get(inp_name)
+		check(err)
+		defer resp.Body.Close()
+		_, err = io.Copy(out, resp.Body)
+		check(err)
+
+		out, err = os.Create("/IO/out" + strconv.Itoa(i))
+		check(err)
+		defer out.Close()
+		resp, err = http.Get(out_name)
+		check(err)
+		defer resp.Body.Close()
+		_, err = io.Copy(out, resp.Body)
+		check(err)
+	}
 
 	command := `
 set -e
-adduser dummy >/dev/null 2>&1 << EOF
-dummypass
-dummypass
-EOF
-
 ip link set eth0 down >/dev/null 2>&1
-chown dummy:dummy $(which wrapper)
-chmod a+s $(which wrapper)
 chown -R dummy:dummy $(pwd)
 sync
-echo "done"
-	`
-	ret, err := exec.Command("sh", "-c", command).CombinedOutput()
+echo "done"`
+
+	ret, err = exec.Command("sh", "-c", command).CombinedOutput()
 	if strings.TrimSpace(string(ret)) != "done" {
-		fmt.Println("-9090\nUser manipulation command failed. Server Error. Aborting")
+		fmt.Println("-9090\nUser manipulation command failed.",
+			"Server Error. Aborting")
 		fmt.Println(string(ret))
 		os.Exit(1)
 	}
 
-	cmd := exec.Command("wrapper")
-	ret, err = cmd.CombinedOutput()
-	if err != nil {
-		fmt.Println(fmt.Sprint(err) + ": " + string(ret))
-	} else {
-		fmt.Println(string(ret))
+	for i := 1; i <= numInputs; i++ {
+
+		command = `
+set -e
+cp ` + "/IO/in" + strconv.Itoa(i) + ` ` + rcfile.Input + `
+cp ` + "/IO/out" + strconv.Itoa(i) + ` ` + rcfile.Output + `
+cp /IO/config.json ./config.json
+chown -R dummy:dummy $(pwd)
+sync
+echo "done"`
+
+		ret, err = exec.Command("sh", "-c", command).CombinedOutput()
+		if strings.TrimSpace(string(ret)) != "done" {
+			fmt.Println("-9090\nUser manipulation command failed.",
+				"Server Error. Aborting")
+			fmt.Println(string(ret))
+			os.Exit(1)
+		}
+
+		cmd := exec.Command("wrapper")
+		ret, err = cmd.CombinedOutput()
+		if err != nil {
+			fmt.Println(fmt.Sprint(err) + ": " + string(ret))
+			break
+		} else {
+			fmt.Println(string(ret))
+			if val, _ := strconv.Atoi(strings.Split(string(ret), "\n")[0]); val != 0 {
+				break
+			}
+		}
 	}
 
 	// Cleaning up

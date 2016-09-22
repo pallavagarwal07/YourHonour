@@ -103,8 +103,10 @@ var submit = function(req, res) {
 
         url_conf = base_url + getTmpURL(configN);
         url_code = base_url + getTmpURL(req.body.code);
-        url_inp  = base_url + qno + "/inputs/1"
-        url_out  = base_url + qno + "/outputs/1"
+        inp_nums = fs.readdirSync('contest/'+qno+'/inputs').length;
+        out_nums = fs.readdirSync('contest/'+qno+'/outputs').length;
+        ques_url = base_url + qno;
+        inp_nums = "" + Math.min(inp_nums, out_nums);
 
         uniqueId = Math.floor(new Date()) + "-" + req.user;
 
@@ -112,16 +114,16 @@ var submit = function(req, res) {
             "containers": [{
                 "name": uniqueId,
                 "image": images[name2id[req.body.lang]],
-                "args": [url_conf, url_code, url_inp, url_out],
-                "imagePullPolicy": "IfNotPresent",
+                "args": [url_conf, url_code, ques_url, inp_nums],
+                "imagePullPolicy": "Always",
                 "resources": {
                     "limits": {
                         "cpu": 1,
-                        "memory": "1224Mi"
+                        "memory": "224Mi"
                     },
                     "request": {
                         "cpu": 1,
-                        "memory": "1224Mi"
+                        "memory": "224Mi"
                     }
                 },
                 "securityContext": { "privileged": true }
@@ -129,10 +131,10 @@ var submit = function(req, res) {
         spec = JSON.stringify({"spec": spec});
 
 
-        cmd = "kubectl run --requests='cpu=1,memory=1224Mi' --restart=Never "+
+        cmd = "kubectl run --requests='cpu=1,memory=224Mi' --restart=Never "+
                "--image=" + images[name2id[req.body.lang]] +
                " --overrides='" + spec + "' " + uniqueId + " -- " + url_conf +
-               " " + url_code + " " + url_inp + " " + url_out;
+               " " + url_code + " " + ques_url + " " + inp_nums;
 
         child2 = exec(cmd, function(err, stdout, stderr) {
             if(stderr !== "" || err !== null) {

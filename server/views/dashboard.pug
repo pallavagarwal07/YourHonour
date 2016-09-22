@@ -7,6 +7,8 @@ html
     script(src='/js/jquery.min.js')
     script(src='/js/bootstrap.min.js')
     script(src='/js/common.js')
+    script(src='/js/dashboard.js')
+    script(src='/js/ace-builds/src-min-noconflict/ace.js')
     meta(name='viewport' content='width=device-width, initial-scale=1')
   body
     .container
@@ -25,7 +27,10 @@ html
           form.form.col-md-12(action='/submit', method='post')
             .row
               .col-xs-12
-                textarea.form-control(placeholder='Input Code Here' name='code' rows=14)
+                textarea.form-control(id="txt" name='code' rows=14 style="display:none")
+                div(id="editor").form-control
+                script.
+                  langs= '!{JSON.stringify(langs)}';
             br
             .row
                 .dropdown.col-xs-3
@@ -35,7 +40,7 @@ html
                     - }
                 button.btn.btn-primary.col-xs-6 Submit
                 .dropdown.col-xs-3.dropdown-menu-right
-                  select.form-control(id='sel1' name='lang')
+                  select.form-control(id='sel2' name='lang')
                     - for(var i in langs) {
                     option= i
                     - }

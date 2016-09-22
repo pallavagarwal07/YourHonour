@@ -1,6 +1,5 @@
 #include <bits/stdc++.h>
 #include <chrono>
-#include <curl/curl.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
@@ -11,6 +10,7 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 #include "../include/rapidjson/document.h"
+#define dbg() fprintf(stdout, "%d\n", __LINE__);
 
 using namespace std;
 using namespace std::chrono;
@@ -262,6 +262,5 @@ int main() {
     // Clean up
     remove("err");
     remove("out");
-    remove(d["executable"].GetString());
     return 0;
 }

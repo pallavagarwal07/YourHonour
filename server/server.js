@@ -53,4 +53,4 @@ fileServer.use(express.static('contest'));
 fileServer.listen(9090);
 app.listen(port);
 console.log('The interface happens on port ' + port);
-console.log('The file serving happens on port ' + port);
+console.log('The file serving happens on port ' + 9090);
