@@ -58,10 +58,17 @@ var getStatus = function(req, res) {
                 var child2 = exec("kubectl logs "+id+" 2>&1", function(err, out, stderr) {
                     if(stderr !== "" || err !== null)
                         return res.send("System error occured in looking up the hostname");
+                    out = out.trim();
+                    out = out.replace(/----BARRIER----$/, "");
                     executed[id] = {
                         'state': "terminated",
-                        'retCd': parseInt(out.split("\n")[0].trim()),
-                        'messg': out.split("\n").slice(1).join("\n").trim(),
+                        'lists': out.split("----BARRIER----").map(function(x){
+                            x = x.trim();
+                            return {
+                                'retCd': parseInt(x.split("\n")[0].trim()),
+                                'messg': x.split("\n").slice(1).join("\n").trim(),
+                            };
+                        }),
                     };
                     return res.send(JSON.stringify(executed[id]));
                 });

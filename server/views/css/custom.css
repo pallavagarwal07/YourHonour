@@ -11,3 +11,7 @@
     bottom: 0;
     left: 0;
 }
+
+.popover {
+    z-index: 1060;
+}

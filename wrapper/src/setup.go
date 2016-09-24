@@ -148,10 +148,10 @@ echo "done"`
 		cmd := exec.Command("wrapper")
 		ret, err = cmd.CombinedOutput()
 		if err != nil {
-			fmt.Println(fmt.Sprint(err) + ": " + string(ret))
+			fmt.Println(fmt.Sprint(err) + ": " + string(ret) + "----BARRIER----")
 			break
 		} else {
-			fmt.Println(string(ret))
+			fmt.Println(string(ret) + "----BARRIER----")
 			if val, _ := strconv.Atoi(strings.Split(string(ret), "\n")[0]); val != 0 {
 				break
 			}
