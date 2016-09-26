@@ -42,7 +42,7 @@ function update(id) {
                 console.log("Err2 is:");
                 console.log( arrayMappings[states.lists[i].retCd] );
                 err2 = err2.replace('ADD_PROPERTY>', 'class="list-group-item" data-placement="bottom" data-toggle="popover"' +
-                        'data-trigger="focus" data-html="true" data-content="<pre>' +
+                        ' data-html="true" id="'+id+'-'+i+'-ln" data-content="<pre>' +
                         states.lists[i].messg.replace(/'/g, "`") + '</pre>"> Test Case '+(i+1)+': ');
                 msglist +=  err2 ;
                 console.log(msglist);
@@ -58,7 +58,16 @@ function update(id) {
                 $('#myModal').modal('show');
                 $(function(){ $('[data-toggle="popover"]').popover(); });
             } }(msglist));
-            $(function(){ $('[data-toggle="popover"]').popover(); });
+
+            $(function(){
+                $('body').on('click', function (e) {
+                    if ($(e.target).data('toggle') !== 'popover'
+                            && $(e.target).parents('.popover.in').length === 0) { 
+                        $('[data-toggle="popover"]').popover('hide');
+                    }
+                });
+                $('[data-toggle="popover"]').popover();
+            });
         }
         else
             setTimeout(update, 1000, id);

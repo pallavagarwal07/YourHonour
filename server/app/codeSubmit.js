@@ -122,7 +122,7 @@ var submit = function(req, res) {
                 "name": uniqueId,
                 "image": images[name2id[req.body.lang]],
                 "args": [url_conf, url_code, ques_url, inp_nums],
-                "imagePullPolicy": "Always",
+                "imagePullPolicy": "IfNotPresent",
                 "resources": {
                     "limits": {
                         "cpu": 1,

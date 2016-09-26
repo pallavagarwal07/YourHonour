@@ -127,7 +127,7 @@ void signalHandler(int signum) {
     int status;
     int ret = waitpid(PID, &status, WNOHANG);
     if (ret == 0) {
-        kill(PID, SIGKILL);
+        kill(-1, SIGKILL);
         timeout = 1;
     }
 }
@@ -203,11 +203,17 @@ int main() {
         milliseconds ms_start =
             duration_cast<milliseconds>(system_clock::now().time_since_epoch());
         if ((PID = fork()) == 0) {
+            if (setpriority(PRIO_PROCESS, 0, 100) != 0) {
+                fprintf(stdout, "set priority failed");
+                exit(1);
+            }
             int fd_out =
                 open("out", O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
             int fd_err =
                 open("err", O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
             int fd_inp = open((char *)d["input"].GetString(), O_RDONLY);
+
+            setpgrp();
 
             if ((n = dup2(fd_inp, 0)) < 0) {
                 printf("Error :( %s\n", strerror(errno));
@@ -225,6 +231,10 @@ int main() {
             }
 
             char **arr = (char **)malloc((args.size() + 1) * sizeof(char *));
+            char **env = (char **)malloc(2 * sizeof(char *));
+            env[0] = new char[100];
+            strcpy(env[0], "mysuperamazingvariable=1");
+            env[1] = NULL;
             for (int i = 0; i < args.size(); i++) {
                 arr[i] = (char *)malloc(strlen(args[1]) + 1);
                 strcpy(arr[i], args[i]);
@@ -244,8 +254,9 @@ int main() {
         }
     }
 
+    string our_outp;
     if (report.retcode == 0) {
-        string our_outp = report.fault_signal;
+        our_outp = report.fault_signal;
 
         if (trim(contents) == trim(our_outp)) {
             report.fault_signal = "Submission was successful!\n";
@@ -256,7 +267,7 @@ int main() {
     }
 
     cout << report.retcode << endl << "Time taken (sec): " << time_child << endl
-         << string(report.fault_signal);
+         << string(report.fault_signal) << endl << endl << string(trim(our_outp));
     fflush(stdout);
 
     // Clean up

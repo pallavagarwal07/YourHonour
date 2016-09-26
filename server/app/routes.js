@@ -1,8 +1,36 @@
+const exec = require('child_process').execSync;
 var submitModule = require('./codeSubmit.js');
 var marked = require('marked');
 var fs = require('fs');
+var IPs = {};
+var state = {};
 
 module.exports = function(app, passport) {
+    app.get(/.*/, function(req, res, next) {
+        var cal = function(val) { return function() {IPs[val]--;}; };
+        var unb = function(val) { return function() {delete state[ip]; exec('sudo iptables -D INPUT -s '+ip+' -p tcp --dport 9000 -j DROP');};};
+        var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+        if (ip.substr(0, 7) == "::ffff:") {
+              ip = ip.substr(7)
+
+        }
+        if(!IPs[ip]) {
+            IPs[ip] = 1;
+            setTimeout(cal(ip), 1000);
+            next();
+        } else {
+            IPs[ip]++;
+            setTimeout(cal(ip), 1000);
+            if(IPs[ip] > 100 && !state[ip]) {
+                state[ip] = 1;
+                exec('sudo iptables -I INPUT -s '+ip+' -p tcp --dport 9000 -j DROP');
+                setTimeout(unb(ip), 30000);
+                res.end();
+            } else {
+                next();
+            }
+        }
+    });
     app.get("/allsubmissions", isLoggedIn, function(req, res) {
         res.send(JSON.stringify(submitModule.scheduled));
     });

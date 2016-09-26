@@ -1,5 +1,4 @@
-YourHonour
-==========
+![YourHonour Banner](server/views/img/yourhonourlogo.png)
 
 A Kubernetes based, extremely easy to deploy programming judge. Right now, everything
 is built specific to the IIT Kanpur network connection and the Vyomkesh Openstack cloud

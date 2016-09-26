@@ -47,6 +47,8 @@ dummypass
 dummypass
 EOF
 
+echo -e 'dummy\thard\tnproc\t2' >> /etc/security/limits.conf
+
 chown dummy:dummy $(which wrapper)
 chmod a+s $(which wrapper)
 mkdir /IO
