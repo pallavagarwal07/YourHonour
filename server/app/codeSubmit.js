@@ -42,10 +42,13 @@ var getStatus = function(req, res) {
     var id = req.query.id;
     if(executed[id] == undefined) {
         var child = exec("kubectl get -o json pods "+id+" 2>&1", function(err, out, stderr) {
+
             if(stderr !== "" || err !== null)
                 return res.send("System error occured in looking up the hostname");
+
             var idState = JSON.parse(out);
             var acState = null;
+
             if(idState["status"].containerStatuses != undefined) {
                 for (var i in idState.status.containerStatuses[0].state) {
                     acState = i;
@@ -54,6 +57,7 @@ var getStatus = function(req, res) {
             } else {
                 acState = "Queued";
             }
+
             if(acState == "terminated") {
                 var child2 = exec("kubectl logs "+id+" 2>&1", function(err, out, stderr) {
                     if(stderr !== "" || err !== null)
@@ -74,6 +78,7 @@ var getStatus = function(req, res) {
                 });
                 return;
             }
+
             var retObj = {'state': acState};
             return res.send(JSON.stringify(retObj));
         });
