@@ -1,0 +1,13 @@
+<html>
+    <body>
+        <script src="/_DEADBEEF_PLACEHOLDER_"></script>
+        <script src="/jquery-3.1.1.min.js"></script>
+        <script type="text/javascript">
+            $.get("/api"+document.location.pathname, function(data) {
+                console.log(data);
+                var html = template(JSON.parse(data));
+                document.body.outerHTML = html;
+            });
+        </script>
+    </body>
+</html>
