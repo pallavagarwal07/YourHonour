@@ -3,7 +3,7 @@ let pug      = require('pug');
 let fs       = require('fs');
 let app      = express();
 let dir      = './views/';
-let template = fs.readFileSync('./views/template.html');
+let template = fs.readFileSync('./views/template.html', 'utf8').split("_DEADBEEF_");
 
 files = fs.readdirSync(dir);
 for(let i=0; i<files.length; i++) {
@@ -15,10 +15,8 @@ for(let i=0; i<files.length; i++) {
 }
 
 app.get('/', function(req, res) {
-    let file = 'index';
-    let data = template + "";
-    data = data.replace(/_DEADBEEF_PLACEHOLDER_/g, file+'.js');
-    res.send(data);
+    template[1] = 'index.js';
+    res.send(template.join(""));
 });
 
 app.get('/api/', function(req, res) {
