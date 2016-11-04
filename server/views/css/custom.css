@@ -1,0 +1,17 @@
+.vertical-center {
+  margin-top: 20px;
+  text-align: right;
+}
+
+#editor { 
+    position: relative;
+    min-height: 30em;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+
+.popover {
+    z-index: 1060;
+}

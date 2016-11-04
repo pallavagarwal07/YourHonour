@@ -1,4 +1,31 @@
-head
-    title= author
-body
-    Hi there
+doctype html
+html
+  head
+    title
+    link(rel='stylesheet', href='/css/bootstrap.min.css')
+    link(rel='stylesheet', href='/css/custom.css')
+    script(src='/js/jquery.min.js')
+    script(src='/js/bootstrap.min.js')
+    script(src='/js/common.js')
+    meta(name='viewport' content='width=device-width, initial-scale=1')
+  body
+    #loginModal.modal.show(tabindex='-1', role='dialog', aria-hidden='true')
+      center
+        h1=  'IITK Programming Judge - ACA' 
+        .bg-danger(hidden=error?false:true)= error
+      .modal-dialog
+        .modal-content
+          .modal-header
+            h1.text-center Login
+          .modal-body
+            form.form.col-md-12.center-block(action='/login', method='post')
+              .form-group
+                input.form-control.input-lg(type='text', name='username', placeholder='Username')
+              .form-group
+                input.form-control.input-lg(type='password', name='password', placeholder='Password')
+              .form-group
+                button.btn.btn-primary.btn-lg.btn-block(type='submit', value='Submit') Sign In
+                span.pull-right
+                span
+          .modal-footer
+            .col-md-12
