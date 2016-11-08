@@ -1,0 +1,7 @@
+FROM iron/gcc:dev
+COPY wrapper/setup wrapper/wrapper /bin/
+RUN ["mkdir", "/work"]
+WORKDIR "/work"
+ENTRYPOINT ["setup"]
+
+# vim:ft=dockerfile:

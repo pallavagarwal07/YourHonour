@@ -1,0 +1,79 @@
+{
+    "c": {
+        "name": "C",
+        "image": "judge-gcc",
+        "filename": "file1.c",
+        "compile": true,
+        "compile_cmd": ["gcc", "-lm",
+            "-O2", "-fomit-frame-pointer", "-o", "code", "file1.c"],
+        "execute": [ "./code" ],
+        "input": "input",
+        "output": "output",
+        "executable": "code"
+    },
+    "cpp": {
+        "name": "C++ 11",
+        "image": "judge-gcc",
+        "filename": "file1.cpp",
+        "compile": true,
+        "compile_cmd": ["g++", "--std=c++11",
+            "-lm", "-O2", "-fomit-frame-pointer", "-o", "code", "file1.cpp"],
+        "execute": [ "./code" ],
+        "input": "input",
+        "output": "output",
+        "executable": "code"
+    },
+    "go": {
+        "name": "Go",
+        "image": "judge-go",
+        "filename": "file1.go",
+        "compile": true,
+        "compile_cmd": ["go", "build", "file1.go"],
+        "execute": [ "./file1" ],
+        "input": "input",
+        "output": "output",
+        "executable": "file1"
+    },
+    "java": {
+        "name": "Java 1.8",
+        "image": "judge-java",
+        "filename": "file1.java",
+        "compile": true,
+        "compile_cmd": [ "sh", "-c",
+            "set -e; a=$(ls -1A); javac file1.java; b=$(ls -1A); echo -e \"$a\n$b\" | sort | uniq -u > class" ],
+        "execute": [ "sh", "-c", "exec java `cat class | sed -r \"s\/\\.class$\/\/g\"`" ],
+        "input": "input",
+        "output": "output",
+        "executable": "file1.java"
+    },
+    "python2": {
+        "name": "Python 2.7",
+        "image": "judge-python2",
+        "filename": "file1.py",
+        "compile": false,
+        "execute": [ "python2", "file1.py" ],
+        "input": "input",
+        "output": "output",
+        "executable": "file1.py"
+    },
+    "python3": {
+        "name": "Python 3.5",
+        "image": "judge-python3",
+        "filename": "file1.py",
+        "compile": false,
+        "execute": [ "python3", "file1.py" ],
+        "input": "input",
+        "output": "output",
+        "executable": "file1.py"
+    },
+    "node": {
+        "name": "NodeJS",
+        "image": "judge-node",
+        "filename": "file1.js",
+        "compile": false,
+        "execute": [ "node", "file1.js" ],
+        "input": "input",
+        "output": "output",
+        "executable": "file1.js"
+    }
+}
