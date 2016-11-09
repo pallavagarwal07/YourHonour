@@ -35,6 +35,19 @@ app.use(morgan('dev'));
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
+app.use(session({ 
+    secret: 'acamadethiscrap',
+    maxAge: new Date(Date.now() + 3600000),
+    resave: true,
+    saveUninitialized: true,
+    store: new MongoStore({
+        mongooseConnection:mongoose.connection
+    }, function(err) {
+        console.log(err || 'connect-mongodb setup ok');
+    })
+}));
+app.use(passport.initialize());
+app.use(passport.session());
 
 if (cluster.isMaster) {
     // Count the machine's CPUs

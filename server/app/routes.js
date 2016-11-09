@@ -45,6 +45,27 @@ module.exports = function(app, passport, template) {
         template[1] = "index.js";
         res.send(template.join(""));
     });
+
+    app.get('/dashboard', isLoggedIn, function(req, res) {
+        template[1] = "dashboard.js";
+        res.send(template.join(""));
+    });
+
+    app.get('/questions', isLoggedIn, function(req, res) {
+        template[1] = "questions.js";
+        res.send(template.join(""));
+    });
+
+    app.post('/login', passport.authenticate('local', {
+        successRedirect: '/dashboard',
+        failureRedirect: '/',
+    }));
+
+    app.get('/logout', function(req, res) {
+        req.logout();
+        res.redirect('/');
+    });
+
 };
 
 function isLoggedIn(req, res, next) {

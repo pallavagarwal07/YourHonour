@@ -4,6 +4,7 @@ var BasicStrategy = require('passport-local').Strategy;
 
 passport.use(new BasicStrategy(
     function(username, password, done) {
+        console.log("Here!!");
         password = require('querystring').escape(password);
         username = require('querystring').escape(username);
         var settings = {

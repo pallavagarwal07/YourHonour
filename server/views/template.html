@@ -7,6 +7,20 @@
                 console.log(data);
                 var html = template(JSON.parse(data));
                 document.body.outerHTML = html;
+                var arr = $("head script");
+                var counter = 0;
+                var run = function() {
+                    console.log(counter, arr, arr.length);
+                    if(counter < arr.length) {
+                        var src = arr[counter].src;
+                        console.log(src);
+                        $.getScript(src, function() {
+                            counter++;
+                            run();
+                        });
+                    }
+                };
+                run();
             });
         </script>
     </body>
