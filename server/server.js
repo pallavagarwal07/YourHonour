@@ -61,11 +61,14 @@ if (cluster.isMaster) {
     // Define all routes
     let routes = require('./app/routes.js');
     routes(app, passport, template);
-    let apirts = require('./app/api.js');
-    apirts(app, passport, template);
 
     app.use(express.static('./views/'));
     fServer.use(express.static('./contest/'));
-    app.listen(3000, function(){console.log("App listening: 3000");});
-    fServer.listen(9090, function(){console.log("FileServer listening: 9090");});
+
+    app.listen(3000, function(){
+        console.log("App listening: 3000");
+    });
+    fServer.listen(9090, function(){
+        console.log("FileServer listening: 9090");
+    });
 }
