@@ -1,16 +1,20 @@
-let mongo  = require('mongodb');
-let md5    = require('md5');
-let fs     = require('fs');
-let assert = require('assert');
-let exec   = require('exec');
-let client = mongo.MongoClient;
-let url    = "mongodb://localhost:27017/session";
-let glob   = {}
-let ret    = null;
+let mongo    = require('mongodb');
+let md5      = require('md5');
+let fs       = require('fs');
+let assert   = require('assert');
+let exec     = require('exec');
+let client   = mongo.MongoClient;
+let url      = "mongodb://localhost:27017/session";
+let glob     = {}
+let ret      = null;
+glob.add = null;
 
-//client.connect(url, function(err, db) {
-//let conn = db.collection("Submissions");
-//});
+client.connect(url, function(err, db) {
+    glob.conn = db.collection("Submissions");
+    glob.add = function(id) {
+        glob.conn.insert({"id": id, "state": "Queued", "result": "unknown"});
+    }
+});
 
 glob.submit = function(req, res) {
     if(!req.body.qno.match(/\d+/))
@@ -54,10 +58,10 @@ glob.submit = function(req, res) {
                     "--image=" + images[name2id[req.body.lang]] +
                     " --overrides='" + spec + "' " + uniqueId + " -- " + url_conf +
                     " " + url_code + " " + ques_url + " " + inp_nums;
-
+                glob.add(uniqueId);
                 child2 = exec(cmd, function(err, stdout, stderr) {
-                    assert(stderr === "", stderr);
-                    assert(err === null, err);
+                    assert(!stderr);
+                    assert(!err);
                     return res.redirect('/submissions');
                 });
             });

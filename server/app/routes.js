@@ -1,6 +1,8 @@
-let exec = require('child_process').exec;
-let IPs  = {};
-let ret  = null;
+let exec   = require('child_process').exec;
+let IPs    = {};
+let ret    = null;
+let submit = null;
+let state  = null;
 
 module.exports = function(app, passport, template) {
     // First do what is common for all requests:
@@ -61,6 +63,15 @@ module.exports = function(app, passport, template) {
         res.send(template.join(""));
     });
 
+    app.get("/allsubmissions", isLoggedIn, function(req, res) {
+        submit.conn.find().toArray(function(err, dat) {
+            arr = [];
+            for(let i=0; i<dat.length; i++)
+                arr[i] = dat[i].id;
+            res.send(JSON.stringify(arr));
+        });
+    });
+
     app.get(/^\/(\d+)$/, isLoggedIn, function(req, res, next) {
         var ques = parseInt(req.params[0]);
         console.log(ret);
@@ -86,7 +97,9 @@ module.exports = function(app, passport, template) {
 
     ret    = require('./api.js')(app, passport, template);
     submit = require("./submit.js")(ret);
+    state  = require("./status.js")(submit, ret);
 
+    app.get('/getstatus', isLoggedIn, state.getStatus);
     app.post('/submit', isLoggedIn, submit.submit);
 
 };

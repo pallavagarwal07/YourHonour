@@ -49,15 +49,15 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-if (cluster.isMaster) {
-    // Count the machine's CPUs
-    var cpuCount = require('os').cpus().length;
-    for (var i = 0; i < cpuCount; i += 1) {
-        cluster.fork();
-    }
+//if (cluster.isMaster) {
+    //// Count the machine's CPUs
+    //var cpuCount = require('os').cpus().length;
+    //for (var i = 0; i < cpuCount; i += 1) {
+        //cluster.fork();
+    //}
     require('./app/mode.js');
     console.log(cluster.isMaster);
-} else {
+//} else {
     // Define all routes
     let routes = require('./app/routes.js');
     routes(app, passport, template);
@@ -65,10 +65,10 @@ if (cluster.isMaster) {
     app.use(express.static('./views/'));
     fServer.use(express.static('./contest/'));
 
-    app.listen(3000, function(){
-        console.log("App listening: 3000");
+    app.listen(9000, function(){
+        console.log("App listening: 9000");
     });
     fServer.listen(9090, function(){
         console.log("FileServer listening: 9090");
     });
-}
+//}
