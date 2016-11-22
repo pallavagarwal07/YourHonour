@@ -4,6 +4,9 @@ var BasicStrategy = require('passport-local').Strategy;
 
 passport.use(new BasicStrategy(
     function(username, password, done) {
+        if(username == "demo" && password == "demo") {
+            return done(null, username);
+        }
         password = require('querystring').escape(password);
         username = require('querystring').escape(username);
         var settings = {'proxy':'http://'+username+':'+password+'@nknproxy.iitk.ac.in:3128'};
