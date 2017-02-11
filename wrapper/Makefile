@@ -13,6 +13,7 @@ wrapper: $(OBJECTS)
 	$(CC) -o wrapper $(OBJECTS) $(FLAGS)
 
 bin/%.o: src/%.cpp
+	mkdir -p bin
 	$(CC) -c $< -o $@ $(FLAGS)
 
 clean:
