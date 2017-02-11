@@ -35,7 +35,7 @@
         "executable": "file1"
     },
     "java": {
-        "name": "Java 1.8",
+        "name": "Java 1_8",
         "image": "judge-java",
         "filename": "file1.java",
         "compile": true,
@@ -47,7 +47,7 @@
         "executable": "file1.java"
     },
     "python2": {
-        "name": "Python 2.7",
+        "name": "Python 2_7",
         "image": "judge-python2",
         "filename": "file1.py",
         "compile": false,
@@ -57,7 +57,7 @@
         "executable": "file1.py"
     },
     "python3": {
-        "name": "Python 3.5",
+        "name": "Python 3_5",
         "image": "judge-python3",
         "filename": "file1.py",
         "compile": false,

@@ -1,14 +1,14 @@
-var md5 = require('md5');
-var path = require('path');
-var fs = require('fs');
-var exec = require('child_process').exec;
-var config = JSON.parse(fs.readFileSync("contest/config.json"));
-var b64 = function(str) { return ( new Buffer(str).toString('base64') ); };
+var md5       = require('md5');
+var path      = require('path');
+var fs        = require('fs');
+var exec      = require('child_process').exec;
+var config    = JSON.parse(fs.readFileSync("contest/config.json"));
+var b64       = function(str) { return ( new Buffer(str).toString('base64') ); };
 var scheduled = [];
-var executed = {};
-var name2id = {};
-var id2name = {};
-var images = {};
+var executed  = {};
+var name2id   = {};
+var id2name   = {};
+var images    = {};
 
 var numQues = fs.readdirSync("contest").filter(function(file) {
     return fs.statSync(path.join("contest", file)).isDirectory();

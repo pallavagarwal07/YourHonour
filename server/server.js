@@ -1,37 +1,45 @@
-var express  = require('express');
-var app      = express();
-var port     = process.env.PORT || 9000;
-var mongoose = require('mongoose');
-var passport = require('passport');
-var flash    = require('connect-flash');
+let express      = require('express');
+let pug          = require('pug');
+let fs           = require('fs');
+let morgan       = require('morgan');
+let cookieParser = require('cookie-parser');
+let bodyParser   = require('body-parser');
+let passport     = require('passport');
+let session      = require('express-session');
+var mongoose     = require('mongoose');
+let cluster      = require('cluster');
+let template     = fs.readFileSync('./views/template.html', 'utf8').split("_DEADBEEF_");
+let app          = express();
+let fServer      = express();
+let dir          = './views/';
+let passStrategy = require('./app/passport.js');
+let MongoStore   = require('connect-mongo')(session);
+var userSchema   = mongoose.Schema({name: String});
 
-var fileServer = express();
+// Compile all pug files before starting the server. Only the compiled
+// javascript will be server. The page will be rendered on the client side!
+files = fs.readdirSync(dir);
+for(let i=0; i<files.length; i++) {
+    if(files[i].match(/\.pug$/)) {
+        let fn = pug.compileFileClient(dir + files[i], {compileDebug: false});
+        let jsname = files[i].replace(/\.pug$/, '.js');
+        fs.writeFileSync(dir + "_cache_/" + jsname, fn);
+    }
+}
 
-var morgan       = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser   = require('body-parser');
-var session      = require('express-session');
+mongoose.connect("mongodb://localhost:27017/session");
 
-var configDB = require('./config/database.js');
-var passStrategy = require('./config/passport.js');
-var MongoStore = require('connect-mongo')(session);
-
-mongoose.connect(configDB.url + "/session");
-var userSchema = mongoose.Schema({
-        name: String,
-
-});
-
-// require('./config/passport')(passport); // pass passport for configuration
-app.set('views', './views')
-app.set('view engine', 'pug');
+// Let's prepare the app. Actual requests will be handled
+// separately in different file.
 app.use(morgan('dev'));
 app.use(cookieParser());
-app.use(bodyParser());
-
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json());
 app.use(session({ 
     secret: 'acamadethiscrap',
     maxAge: new Date(Date.now() + 3600000),
+    resave: true,
+    saveUninitialized: true,
     store: new MongoStore({
         mongooseConnection:mongoose.connection
     }, function(err) {
@@ -40,17 +48,27 @@ app.use(session({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(flash());
-require('./app/routes.js')(app, passport);
-app.use(express.static('views'));
-app.get(/(.*)/, function(req, res) {
-    res.status(404);
-    res.render("404", {url: req.params[0]});
-});
 
-fileServer.use(express.static('contest'));
+//if (cluster.isMaster) {
+    //// Count the machine's CPUs
+    //var cpuCount = require('os').cpus().length;
+    //for (var i = 0; i < cpuCount; i += 1) {
+        //cluster.fork();
+    //}
+    require('./app/mode.js');
+    console.log(cluster.isMaster);
+//} else {
+    // Define all routes
+    let routes = require('./app/routes.js');
+    routes(app, passport, template);
 
-fileServer.listen(9090);
-app.listen(port);
-console.log('The interface happens on port ' + port);
-console.log('The file serving happens on port ' + 9090);
+    app.use(express.static('./views/'));
+    fServer.use(express.static('./contest/'));
+
+    app.listen(9000, function(){
+        console.log("App listening: 9000");
+    });
+    fServer.listen(9090, function(){
+        console.log("FileServer listening: 9090");
+    });
+//}
