@@ -9,6 +9,13 @@ Once the functionality is complete, I will work on adding support for easy deplo
 on any nodes. If you think you have suggestons, or if you are willing to contribute to
 this project, I would be delighted to accept your pull request.
 
+## Steps to setup for the first time:
+- Install mongodb
+- Create /data/db directory and restart mongodb
+- Install GoLang
+- `make`
+- `cd server` and `npm install`
+
 
 ---
 
